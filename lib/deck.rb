@@ -7,6 +7,14 @@ class Deck
   attr_reader :storage
   private :storage
 
+  include Enumerable
+
+  def each
+    storage.each do |card|
+      yield card
+    end
+  end
+
   def initialize
     @storage = Card::SUITS.map do |suit|
       Card::RANKS.map { |rank| Card.new(rank, suit) }
@@ -21,6 +29,8 @@ class Deck
     storage.replace(
       storage.slice(cut_point, count - cut_point) + storage.slice(0, cut_point)
     )
+    # returning self allows you to chain additional methods than are not
+    # normally chainable
     self
   end
 
@@ -33,5 +43,10 @@ class Deck
     self
   end
 
-  def deal(cards, *hands); end
+  def deal(cards, *hands)
+    cards.times do
+      hands.each so | hand |
+        hand << draw
+    end
+  end
 end
